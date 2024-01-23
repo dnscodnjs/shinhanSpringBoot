@@ -6,9 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
 @SpringBootTest
@@ -84,7 +90,15 @@ public class BoardRepositoryTests {
     }
 
     @Test
-    public void testByTitle() throws Exception{
+    public void findALl() throws Exception {
+        //given
+        System.out.println(boardRepository.findAll());
+
+
+    }
+
+    @Test
+    public void testByTitle() throws Exception {
         //given
 
         boardRepository.findBoardByTitle("제목..177")
@@ -93,7 +107,7 @@ public class BoardRepositoryTests {
     }
 
     @Test
-    public void testByWriter() throws Exception{
+    public void testByWriter() throws Exception {
         //given
         Collection<Board> results = boardRepository.findByWriter("user00");
 
@@ -104,7 +118,7 @@ public class BoardRepositoryTests {
     }
 
     @Test
-    public void testByWriterContaining() throws Exception{
+    public void testByWriterContaining() throws Exception {
         //given
         Collection<Board> results = boardRepository.findByWriterContaining("05");
         results.forEach(board -> System.out.println(board));
@@ -112,19 +126,83 @@ public class BoardRepositoryTests {
     }
 
     @Test
-    public void testByTitleAndBno() throws Exception{
+    public void testByTitleAndBno() throws Exception {
         //given
         Collection<Board> results = boardRepository.findByTitleContainingAndBnoGreaterThan("5", 326L);
         results.forEach(board -> System.out.println(board));
 
     }
 
-    @Test
-    public void testBnoOrderBy() throws Exception{
+/*    @Test
+    public void testBnoOrderBy() throws Exception {
         //given
         Collection<Board> results = boardRepository.findByBnoGreaterThanOrderByBnoDesc(300L);
         results.forEach(board -> System.out.println(board));
 
+    }*/
+
+
+/*
+    @Test
+    public void testBnoOrderByPaging() throws Exception {
+        //given
+        Pageable paging = PageRequest.of(0, 10);
+        Page<Board> results = boardRepository.findByBnoGreaterThanOrderByBnoDesc(202L, paging);
+        results.forEach(board -> System.out.println(board));
+    }
+*/
+
+    @Test
+    public void testBnoPagingSort() throws Exception {
+        //given
+        Pageable paging = PageRequest.of(0, 10, Sort.Direction.ASC, "bno");
+
+        Page<Board> result = boardRepository.findByBnoGreaterThan(202L, paging);
+
+        System.out.println("PAGE SIZE : " + result.getSize());
+        System.out.println("TOTAL PAGES : " + result.getTotalPages());
+        System.out.println("TOTAL COUNT : " + result.getTotalElements());
+        System.out.println("NEXT : " + result.nextPageable());
+
+        List<Board> list = result.getContent();
+
+        list.forEach(board -> System.out.println(board));
     }
 
+    @Test
+    public void testByTitle2() throws Exception {
+        //given
+        boardRepository.findByTitle("17")
+                .forEach(board -> System.out.println(board));
+
+    }
+
+    @Test
+    public void testByContent() throws Exception {
+        //given
+        boardRepository.findByContent("6")
+                .forEach(board -> System.out.println(board));
+
+    }
+
+    @Test
+    public void testByTitle17() throws Exception {
+        //given
+        boardRepository.findByTitle2("17")
+                .forEach(arr -> System.out.println(Arrays.toString(arr)));
+
+    }
+
+    @Test
+    public void testByPaging() throws Exception {
+        //given
+
+//        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.ASC, "bno");
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        boardRepository.findByPage(pageable)
+                .forEach(board -> System.out.println(board));
+
+    }
 }
